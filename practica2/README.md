@@ -1,4 +1,4 @@
-# Práctica 2: Exclusiión Mutua: Locks y Pools en Java
+# Práctica 2: Exclusión Mutua: Locks y Pools en Java
 
 Implementación de los ejercicios correspondientes a la **Práctica 02** de la materia de **Cómputo Concurrente**.
 
