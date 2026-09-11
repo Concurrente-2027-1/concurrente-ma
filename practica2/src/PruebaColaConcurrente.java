@@ -16,6 +16,8 @@ public class PruebaColaConcurrente {
 
     public static void main(String[] args) {
         ColaConcurrente cola = new ColaConcurrente();
+        // Para ejecutar las pruebas de ColaConcurrenteSynchronized (ejercicio 4), comentamos la linea anterior y descomentamos la siguiente
+        // ColaConcurrenteSynchronized cola = new ColaConcurrenteSynchronized();
         
         // Este Executor simulará 10 hilos de un programa intentando acceder a la cola al mismo tiempo
         ExecutorService hilosSimulados = Executors.newFixedThreadPool(10);

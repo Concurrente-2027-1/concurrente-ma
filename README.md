@@ -23,6 +23,9 @@ Entre los recursos que se encuentran actualmente en este repositorio están:
 ├── practica1/
 |   ├── docs/
 │   └── src/
+├── practica2/
+|   ├── docs/
+│   └── src/
 ├── README.md
 └── .gitignore
 ```
