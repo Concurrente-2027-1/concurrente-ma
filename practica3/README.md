@@ -1,4 +1,4 @@
-# Práctica 2: Exclusión Mutua: Cándados Clásicos y el Modelo de Memoria de Java (JMM)
+# Práctica 3: Exclusión Mutua: Cándados Clásicos y el Modelo de Memoria de Java (JMM)
 
 Implementación de los ejercicios correspondientes a la **Práctica 03** de la materia de **Cómputo Concurrente**.
 
