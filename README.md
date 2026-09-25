@@ -16,7 +16,7 @@ Entre los recursos que se encuentran actualmente en este repositorio están:
 ### Prácticas:
 - **Práctica 01**. Repaso de Java e introducción a la programación multihilos.
 - **Práctica 02**. Exclusión Mutua: Locks y Pools en Java.
-- **Práctica 03**. Exclusión Mutua: Caándados Clásicos y el Modelo de Memoria de Java (JMM)
+- **Práctica 03**. Exclusión Mutua: Cándados Clásicos y el Modelo de Memoria de Java (JMM).
 
 ## Estructura del repositorio
 
