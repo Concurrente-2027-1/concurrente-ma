@@ -1,0 +1,96 @@
+\item[\textbf{3.}] \textbf{[40 min/25 puntos]} \textcolor{dkgreen}{El problema clásico de los prisioneros y el interruptor.}
+
+    \textcolor{dkgreen}{Eres uno de los $n$ prisioneros arrestados. El alcaide de la prisión, un excomputólogo, reúne a todos los prisioneros en el patio y les anuncia el siguiente reto:}
+
+    \begin{quote}
+    \textcolor{azul}{``A partir de mañana, serán confinados en celdas individuales de aislamiento sin ninguna posibilidad de comunicarse entre ustedes. Sin embargo, hoy tienen una hora para acordar una estrategia.''}
+    \end{quote}
+
+    \textcolor{dkgreen}{Las reglas del reto son las siguientes:}
+
+    \begin{itemize}
+        \item \textcolor{dkgreen}{Hay una habitación especial que contiene un único interruptor.}
+        \item \textcolor{dkgreen}{Se sabe con certeza que, al iniciar el reto, el estado inicial del interruptor es \textsc{OFF} (apagado).}
+        \item \textcolor{dkgreen}{El interruptor no está conectado a nada externo; su única función es mantener su estado (\textsc{ON} u \textsc{OFF}).}
+        \item \textcolor{dkgreen}{Cada día, el alcaide elegirá a un prisionero de manera aleatoria y lo llevará a la habitación del interruptor.}
+        \item \textcolor{dkgreen}{El alcaide garantiza justicia (\textit{fairness}) en su elección: si el juego dura lo suficiente, cada prisionero visitará la habitación infinitas veces.}
+        \item \textcolor{dkgreen}{El prisionero que entra a la habitación puede observar el estado del interruptor y, si lo desea, cambiarlo (de \textsc{ON} a \textsc{OFF}, o de \textsc{OFF} a \textsc{ON}), o dejarlo como está.}
+        \item \textcolor{dkgreen}{En cualquier momento, si el prisionero en turno está absolutamente seguro, puede anunciar al alcaide: ``Todos los $n$ prisioneros hemos visitado esta habitación al menos una vez''.}
+        \item \textcolor{dkgreen}{Si tiene razón, todos son liberados. Si se equivoca, permanecerán encerrados para siempre.}
+    \end{itemize}
+
+    \textcolor{azul}{\textbf{Instrucciones:}}
+
+    \begin{enumerate}
+        \item \textcolor{dkgreen}{Diseña un algoritmo concurrente (estrategia) que garantice que los prisioneros sean liberados. Argumenta paso a paso por qué tu solución es correcta y segura frente a cualquier orden de ejecución del alcaide.}
+    \end{enumerate}
+
+    \textcolor{red}{\textbf{Hint:} En algoritmos concurrentes, a veces es útil romper la simetría teniendo un proceso que actúe como ``coordinador'' o contador, mientras los demás actúan como procesos regulares.}\\
+
+    La estrategia que tendrán los prisioneros es que antes del aislamiento los $n$ prisioneros se pondrán de acuerdo y harán lo siguiente:
+
+    \begin{itemize}
+        \item Lo primero que se hará será contar el total de prisioneros que hay y designar a \textbf{UN ÚNICO} prisionero como el \textbf{contador}. Para designar a este contador ya dependerá de cómo lo quieran hacer, esto puede ser con el prisionero que lleve más tiempo, el que lleve menos tiempo, el que tenga el número de identificación más alto o bajo, aquí ya dependerá de cómo se organicen los prisioneros.
+
+        \item Los prisioneros restantes serán tomados como un \textbf{prisionero común. }
+
+        \item Los prisioneros que son tomados como un \textbf{prisionero común} van a tener una variable privada, en otra palabras ellos irán informando por medio de una clave cuando ingresen por primera vez a la habitación.
+
+        \[
+        \text{avis\'o}_p \in \{\text{falso}, \text{verdadero}\}, \quad \text{inicializada en } \text{falso}.
+    \]
+
+    \item El \textbf{contador} mantiene una variable local privada $\textit{cuenta} \in \mathbb{N}$, inicializada en $0$, en otras palabras el contador como lo dice su nombre irá contando las veces que un prisionero entró a la habitación.
+    
+    \end{itemize}
+
+\subsubsection*{Protocolo de un prisionero común $p$ (en cada visita)}
+\begin{verbatim}
+si (interruptor == OFF) y (aviso_p == falso):
+    interruptor <- ON
+    aviso_p <- verdadero
+si no:
+    no hacer nada
+\end{verbatim}
+
+\textbf{Interpretación:}
+
+Cuando un prisionero Normal $p$ entra a la habitación y encuentra el interruptor en \textsc{OFF}, esto significa que \textbf{no hay ningún aviso pendiente sin consumir} en este momento. Esto puede deberse a dos razones distintas:
+
+\begin{itemize}
+    \item Todavía nadie ha avisado, \textbf{o}
+    \item Alguien ya avisó antes, pero el Contador ya pasó por la habitación y lo apagó (es decir, ya ``consumió'' ese aviso).
+\end{itemize}
+
+Sin embargo, encontrar el interruptor en \textsc{OFF} \textbf{no es suficiente} para que $p$ decida encenderlo. Es necesaria una \textbf{segunda condición}: que $p$ \textbf{nunca haya avisado antes} ($\text{avis\'o}_p = \text{falso}$). Esto es importante porque si $p$ ya avisó una vez (aunque el interruptor esté de nuevo en \textsc{OFF} más adelante), \textbf{no debe volver a encenderlo}, porque de lo contrario el contador lo contaría dos veces y creería, erróneamente, que hay más prisioneros distintos de los que realmente han visitado la habitación. Por eso la condición usa el conector \textbf{``y''} porque deben cumplirse ambas cosas, no solo la primera.
+
+Solo cuando \textbf{ambas} condiciones se cumplen ($\text{interruptor} = \textsc{OFF}$ \textbf{y} $\text{avis\'o}_p = \text{falso}$), $p$ enciende el interruptor y marca $\text{avis\'o}_p \leftarrow \text{verdadero}$ para nunca volver a hacerlo.
+
+Si, en cambio, $p$ encuentra el interruptor en \textsc{ON}, no debe hacer nada: deja que sea el \textbf{Contador} quien lo observe, lo apague y sume $1$ a su cuenta. Esto asegura que cada encendido sea contado \textbf{exactamente una vez}, y por el prisionero correcto que lo generó.
+
+\subsubsection*{Protocolo del Contador (en cada visita)}
+\begin{verbatim}
+si (interruptor == ON):
+    interruptor <- OFF
+    cuenta <- cuenta + 1
+
+si (cuenta == n - 1):
+    anunciar "los n prisioneros ya visitaron la habitacion"
+\end{verbatim}
+
+\textbf{Interpretación:}
+
+Cuando el \textbf{Contador} entra a la habitación y encuentra el interruptor en \textsc{ON}, esto significa que hay exactamente \textbf{un aviso pendiente} dejado por algún prisionero común que aún no había sido contado. El Contador hace dos cosas:
+
+\begin{itemize}
+    \item \textbf{Apaga el interruptor} ($\text{interruptor} \leftarrow \textsc{OFF}$): esto ``libera el casillero'' para que otro prisionero común (uno que todavía no haya avisado) pueda encenderlo más adelante. Este paso es indispensable: si el Contador no apagara el interruptor, ningún otro prisionero podría volver a avisar (porque su condición exige encontrarlo en \textsc{OFF}).
+    \item \textbf{Incrementa su cuenta} ($\textit{cuenta} \leftarrow \textit{cuenta} + 1$): registra que hay un prisionero común más que ya visitó la habitación. Como cada prisionero (menos el contador) enciende el interruptor a lo sumo una vez en toda la partida, este incremento corresponde, sin ambigüedad, a un prisionero \textbf{distinto} de todos los contados anteriormente.
+\end{itemize}
+
+Si en cambio el Contador encuentra el interruptor en \textsc{OFF}, no hace nada en esta parte: significa que no hay ningún aviso nuevo por consumir en este momento.
+
+Después de esto (en la misma visita), el Contador revisa si ya alcanzó el total esperado: $\textit{cuenta} = n - 1$. Este valor corresponde exactamente al número de prisioneros \textbf{Comunes} (todos excepto el propio Contador). Si la igualdad se cumple, el Contador puede anunciar con \textbf{total certeza} que los $n$ prisioneros ya visitaron la habitación al menos una vez.\\
+
+Este algoritmo es seguro y confiable porque cada prisionero común tiene la orden de avisar una única vez, por lo que el contador tendrá la seguridad de que ya pasaron TODOS y que no está contando a un prisionero dos o más veces. 
+
+    

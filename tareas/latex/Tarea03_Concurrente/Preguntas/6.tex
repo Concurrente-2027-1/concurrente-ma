@@ -1,0 +1,43 @@
+
+\item[\textbf{6.}] \textbf{[20 min/25 puntos]} \textcolor{dkgreen}{Considera la siguiente clase $Visibility$:}\\
+\par
+\begin{lstlisting}[numbers=none,language=Java,caption=Clase "VisibilityField"]
+class Visibility {
+    Shared Variables:
+\end{lstlisting}
+
+\begin{lstlisting}[
+    firstnumber=1,
+    numbers=left,
+    language=Java
+]
+    int x=0;
+    volatile Boolean flag=false;
+    void writerThread() {
+        try {
+            Thread.sleep(1000);
+            x = 1;
+            flag = true;
+        } catch(InterruptedException e) {}
+    }
+    void readerThread() {
+        while(!flag){}
+        int y = 100/x;
+    }
+\end{lstlisting}
+
+\begin{enumerate}
+    \item \textcolor{dkgreen}{¿Es posible que el método \texttt{readerThread()} divida entre cero? Argumenta porqué.}
+
+    No, en este caso no es posible dividir entre 0. Esto se debe a que \texttt{flag} es \texttt{volatile}. El hilo que escribe primero cambia \texttt{x} a 1 y después cambia \texttt{flag} a \texttt{true}. Cuando el sistema observa que la bandera ya está en \texttt{true}, también puede observar el cambio anterior de \texttt{x}, por lo que \texttt{x} ya vale 1 y no puede realizarse una división entre cero.
+
+    
+    \item \textcolor{dkgreen}{Si ambas variables son \texttt{volatile}, ¿es posible que el método \texttt{readerThread()} divida entre cero? Argumenta porqué.}
+
+    No, en este caso tampoco es posible, aunque ambas sean volatile al igual que en la respuesta anterior primero se cambiaría el valor de x a 1 y ya después flag a true, por lo que de igual forma no se puede dividir entre 0. 
+
+    \item \textcolor{dkgreen}{Si ninguna de las dos variables es \texttt{volatile}, ¿es posible que el método \texttt{readerThread()} divida entre cero? Argumenta porqué.}
+
+    Para este caso si es posible que se pueda dividir entre 0, como ya ninguna variable es volatile el sistema puede pasar la bandera a true antes de poner x=1 porque ya se trata de dos instrucciones independientes, es decir, el sistema ve la bandera levantada o en true y sale del ciclo, al salir puede encontrar x=0, así que en este caso si se puede dividir entre 0. Igual otro caso que podemos encontrar es que los valores estén desactualizados, por lo que al llegar a la división puede que x se encuentre con el valor de 0. 
+
+\end{enumerate}

@@ -1,0 +1,13 @@
+\item[\textbf{1.}] \textbf{[15 min/10 puntos]} \textcolor{dkgreen}{Contesta de forma breve (máximo 3 líneas por pregunta) lo siguiente:}
+\begin{enumerate}
+    \item \textcolor{dkgreen}{¿Qué es una especificación secuencial de un objeto?}
+\end{enumerate}
+    Es un conjunto de condiciones que describe cómo es el estado de un objeto cuando ejecuta uno o varios métodos de menra secuencial. En particular, se describe mediante precondiciones (antes de la invocación) y post-condiciones (al terminar). Es el comportamiento secuencial esperado que un algoritmo concurrente debe poder lograr para considerarse correcto.
+\begin{enumerate}
+    \item \textcolor{dkgreen}{Describe con tus propias palabras, ¿en qué consiste la linealizabilidad?}
+\end{enumerate}
+La linealizabilidad es una fomra de verificar si un algoritmo concurrente cumple las especificaciones secuenciales de un objeto, mediante los puntos de linealización y tomando en cuenta estrictamente el tiempo real o global.
+\begin{enumerate}
+    \item \textcolor{dkgreen}{Describe con tus propias palabras, ¿cuál es la diferencia entre la consistencia secuencial y la linealizabilidad?}
+\end{enumerate}
+Aunque ambos evalúan si una implementación o ejecución concurrente es correcta, la diferencia de paradigma radica en que la linealización es estricta con orden global de las operaciones, mientras que la consistencia secuencial basta con mantener el orden local de cada hilo.

@@ -1,0 +1,27 @@
+\textcolor{blue}{2. [15 min/30 puntos] Considera que en una empresa necesitan computar un problema, sin
+embargo solo se puede paralelizar el 80$\%$ de su cómputo. Al dueño de la empresa no le importa
+invertir en tecnología. ¿De cuántos cores necesitaría comprar su computadora para aumentar la
+velocidad de cómputo del problema al triple?}\\
+
+A comparación del problema anterior aquí sólo se puede paralelizar el 80$\%$ por lo que de nuevo tendremos que despejar la Ley de Amdahl. Como datos tenemos 
+
+$$p = 0.80$$
+$$S=3$$
+
+por lo que tenemos que encontrar $n$
+
+$$S(n)=\frac{1}{(1-p)+\frac{p}{n}} $$
+
+despejamos 
+
+$$\frac{1}{S(n)}= (1-p)+\frac{p}{n}$$
+$$\frac{1}{S(n)}-(1-p)=\frac{p}{n}$$
+$$n\Big(\frac{1}{S(n)}-(1-p)\Big)=p$$
+$$\frac{n(\frac{1}{S}-(1-p))}{\frac{1}{S}-(1-p)}= \frac{p}{\frac{1}{S}-(1-p)}$$
+$$n = \frac{p}{\frac{1}{S}-(1-p)}$$
+
+sustituimos
+
+$$ n = \frac{0.80}{\frac{1}{3}-(1-0.80)}= 6$$
+
+En conclusión la empresa necesitaría una computadora con 6 cores para obtener una aceleración al triple.\\

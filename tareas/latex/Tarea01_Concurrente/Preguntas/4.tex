@@ -1,0 +1,245 @@
+\textcolor{blue}{\textbf{4.0 [30 min/25 puntos]}
+    \textbf{Concurrencia en la vida real: El costo de un concierto masivo.}}
+
+    \textcolor{blue}{El Palacio de los Deportes en la Ciudad de México tiene una
+    capacidad máxima aproximada de 22,000 espectadores en configuración
+    de concierto.}
+
+    \textcolor{blue}{\textbf{Para que todos tengan señal, los ingenieros no usan una sola antena
+    gigante, sino que dividen el terreno en 30 zonas o ``células'' de red
+    (microcells). Imagina que particionan el mapa del estadio en 30
+    cuadrantes independientes; cada antena solo atiende a los teléfonos
+    que están físicamente dentro de su zona (una estrategia de
+    ``divide y vencerás'').}
+
+    \textcolor{blue}{Sin embargo, por limitaciones físicas del espectro 4G LTE, el hardware de cada célula tiene un límite estricto de concurrencia: solo puede
+    despachar los datos de 55 usuarios de manera simultánea en un instante
+    dado.}
+
+    \textcolor{blue}{Como hay muchas más personas que capacidad simultánea, la antena actúa
+    como el planificador de un Sistema Operativo (scheduler): encola a los
+    usuarios y los atiende por ``ciclos'' o bloques de tiempo. Es decir,
+    despacha un bloque de 55 mensajes, luego el siguiente bloque de 55,
+    y así sucesivamente.}
+
+    \textcolor{blue}{Si consideramos que cada ciclo de transmisión toma 50 milisegundos
+    (0.05 segundos) para lograr enviar los datos de esas 55 personas.}
+
+    \vspace{0.3cm}
+
+    \textcolor{blue}{\textbf{Responde lo siguiente mostrando tu procedimiento}}
+
+    \noindent
+    \textcolor{red}{\textit{Nota: como no puedes tener fracciones de personas o fracciones
+    de ciclos de envío, utiliza la función techo $\lceil x\rceil$ para
+    redondear hacia arriba cuando sea necesario:}}
+
+    \begin{enumerate}
+
+        \item \textcolor{azul}{Suponiendo que el recinto está a su máxima capacidad y el
+        público se distribuye uniformemente, ¿cuántas personas están
+        conectadas a una sola célula de red?}
+
+        Recordemos que la capacidad máxima del recinto es de 22,000. Para encontrar cuántas personas le corresponden a cada célula, dividimos el número de capacidad máxima entre el número de células o cuadrantes. Tal como se nos menciona, no podemos tener fracciones de personas, por lo que aplicamos función techo:
+        \begin{equation*}
+            \lceil \frac{22,000}{30} \rceil = \lceil 733.33 \rceil = 734
+        \end{equation*}
+        Por lo tanto, hay un total de 734 personas conectadas a cada célula, suponiendo que están distribuidas uniformemente por el recinto.
+        
+        \item \textcolor{azul}{Si todas las personas de esa célula intentan enviar un
+        mensaje exactamente al mismo tiempo (justo cuando sale el artista),
+        ¿cuántos ciclos de transmisión (bloques de 55) tiene que procesar
+        la antena para despachar a toda la fila?}\\
+        Como cada ciclo o bloque de transmisión, solo puede procesar un máximo de 55 mensajes de manera concurrente, para procesar todos los 734 mensajes que le tocan a una sola célula, necesita el siguiente número de ciclos:
+        \begin{equation*}
+            \lceil \frac{734}{55} \rceil = \lceil 13.34 \rceil = 14
+        \end{equation*}
+        La antena tendría que procesar 14 ciclos de transmisión para que pueda atender a todos los mensajes entrantes de la fila.
+        
+        \item \textcolor{azul}{Calcula el tiempo de espera (en segundos) que experimentaría
+        el último grupo de la fila para que su mensaje logre salir
+        exitosamente. (Esta es la razón por la que en los conciertos tu
+        celular marca que tienes señal, pero el mensaje se queda con el
+        icono del ``reloj'' esperando salir).} \\
+        Como se calculo en el anterior inciso, se toman 14 ciclos para despachar a todas las personas que intentan enviar un mensaje al mismo tiempo por célula. El planteamiento del problema nos dice que cada ciclo de transmisión toma 50 milisegundos (0.05 segundos), el último grupo (el ciclo 14) deberá esperar estos 13 ciclos anteriores, más su propio ciclo, por lo que, el tiempo de espera para este último grupo tiene que ser para 14 ciclos:
+        \begin{equation*}
+            14 \text{ ciclos} \times 0.05 \frac{\text{segundos}}{\text{ciclo}} = 0.7 \text{ segundos}
+        \end{equation*}
+        Tenemos así, que el último grupo experimentará un tiempo de espera de 0.7 segundos o 700 milisegundos.
+    \end{enumerate}
+
+    %------------------------------------------------
+    % Segunda parte de la pregunta 4
+    %------------------------------------------------
+
+    \textcolor{blue}{\textbf{¿Cómo llegamos a la fila de la antena? (El problema del
+    acceso inicial)}}\\
+
+    \textcolor{blue}{Antes de que tu teléfono sea asignado a un ``ciclo'' de transmisión
+    (donde la antena actúa como un planificador ordenado que evita
+    choques), primero tiene que pedir permiso para entrar a la fila.}
+
+    \textcolor{blue}{Cuando quieres mandar un mensaje, tu celular se despierta y manda una
+    señal abierta: ``¡Oye antena, necesito enviar datos!''. Esto lo hace
+    a través de un canal público de acceso aleatorio.}\\
+
+    \textcolor{blue}{¿Cuál es el problema? En un entorno saturado, múltiples teléfonos
+    pueden intentar pedir permiso exactamente al mismo tiempo. Cuando
+    esto ocurre, las peticiones chocan y la antena solo recibe ruido
+    (una \textbf{Colisión}).}
+
+    \textcolor{blue}{Si la antena no responde, los teléfonos saben que chocaron. Si
+    simplemente reintentaran pedir permiso de inmediato, volverían a
+    chocar infinitamente. Este fenómeno de saturación se conoce como
+    \textbf{colapso por congestión}.}\\
+
+    \textcolor{blue}{Para resolver esto, los sistemas utilizan un algoritmo llamado
+    \textbf{Retroceso Exponencial (Exponential Backoff)}. Este algoritmo
+    obliga a los clientes a esperar un tiempo aleatorio antes de volver
+    a intentar. Cada vez que vuelven a chocar, la ``ventana'' de tiempo
+    de espera posible crece de forma exponencial, dispersando los
+    reintentos en el tiempo para liberar la contención y permitir que
+    alguien logre pasar y entrar a la fila de despacho.}
+
+    \vspace{0.2cm}
+
+    \noindent
+    \textcolor{red}{\textbf{Nota:} Este algoritmo es un pilar de la computación concurrente
+    y distribuida. Se utiliza en redes celulares, protocolos de
+    enrutamiento de caché, y es fundamental en el diseño de algoritmos
+    de exclusión mutua (candados o ``locks'' concurrentes en memoria
+    compartida) para evitar que múltiples hilos ahoguen el procesador
+    intentando adquirir un recurso al mismo tiempo.}
+
+    \vspace{0.3cm}
+
+    \textcolor{blue}{\textbf{Contención y Retroceso Exponencial.}}
+
+    \textcolor{blue}{Supongamos que el ciclo base de espera (slot time) del algoritmo de
+    retroceso es de 50 milisegundos. Después de cada intento fallido $c$,
+    el dispositivo espera un tiempo aleatorio eligiendo un número de
+    ciclos (o ranuras de tiempo) dentro del intervalo}
+
+    \[
+        [0,2^c-1].
+    \]
+
+    \textcolor{blue}{\textbf{Ejemplo de cómo funciona:}}
+
+    \begin{itemize}
+
+        \item \textcolor{blue}{\textbf{1ra colisión ($c=1$):}
+        El intervalo es}
+        \[
+            [0,2^1-1]=[0,1].
+        \]
+        \textcolor{blue}{El teléfono lanza una moneda y escoge esperar 0 o 1 ciclos.
+        Si le va mal y elige 1, esperará}
+        \[
+            1\times50\text{ ms}=50\text{ ms}.
+        \]
+
+        \item \textcolor{blue}{\textbf{2da colisión ($c=2$):}
+        El intervalo crece a}
+        \[
+            [0,2^2-1]=[0,3].
+        \]
+        \textcolor{blue}{El teléfono puede escoger al azar esperar 0, 1, 2 o 3 ciclos.
+        En el peor escenario, escogerá 3 ciclos y esperará}
+        \[
+            3\times50\text{ ms}=150\text{ ms}.
+        \]
+
+        \item \textcolor{blue}{\textbf{3ra colisión ($c=3$):}
+        El intervalo es}
+        \[
+            [0,2^3-1]=[0,7].
+        \]
+        \textcolor{blue}{En el peor escenario, escogerá 7 ciclos y esperará}
+        \[
+            7\times50\text{ ms}=350\text{ ms}.
+        \]
+
+    \end{itemize}
+
+    \noindent
+    \textcolor{blue}{Responde lo siguiente, asumiendo el peor escenario para el usuario
+    más lento (aquel que por extrema mala suerte siempre elige el número
+    más grande de su intervalo):}
+
+    \begin{enumerate}
+
+        \item \textcolor{azul}{\textbf{Siguiendo la lógica del ejemplo,} ¿cuál es el
+        intervalo de ventanas (es decir, el rango de ciclos a elegir) en
+        su sexta colisión ($c=6$)?}
+
+        Tomando como base la fórmula que siguen los ejemplos tenemos 
+
+        $$[0,2^c-1]$$
+
+        Para la sexta colisión tenemos 
+        $$[0,2^6-1] = [0,63]$$
+
+        En el peor escenario escogerá 63 ciclos.
+
+        \item \textcolor{azul}{En ese sexto intento fallido, ¿cuánto es el tiempo máximo
+        (en segundos) que ese teléfono esperará solamente en esa ronda
+        antes de intentar de nuevo?}
+
+        Como tenemos 63 ciclos, esperará $$63\cdot50ms = 3,150ms$$
+
+        Lo pasamos a segundos 
+        $$3,150 ms = 3.15 s$$
+
+        Por lo tanto esperará 3.15 segundos antes de intentar de nuevo. 
+
+        \item \textcolor{azul}{Calcula el tiempo de espera máximo acumulado (en segundos)
+        que el teléfono sufrió en total si sumamos sus esperas máximas
+        desde el intento 1 hasta el intento 6 (es decir, suma el peor
+        tiempo de $c=1$, más el peor de $c=2$, más el peor de $c=3$
+        \ldots hasta $c=6$).}
+
+        Para calcular el tiempo de espera máximo acumulado, sumamos los tiempos máximos de espera de cada una de las seis colisiones:
+$$
+[0,2^1-1]=[0,1]
+$$
+
+$$
+[0,2^2-1]=[0,3]
+$$
+
+$$
+[0,2^3-1]=[0,7]
+$$
+
+$$
+[0,2^4-1]=[0,15]
+$$
+
+$$
+[0,2^5-1]=[0,31]
+$$
+
+$$
+[0,2^6-1]=[0,63]
+$$
+
+$$
+\begin{aligned}
+T &= (1\cdot50) + (3\cdot50) + (7\cdot50) + (15\cdot50) + (31\cdot50) + (63\cdot50) \text{ ms}\\
+T &= 50 + 150 + 350 + 750 + 1550 + 3150 \text{ ms}\\
+T &= 6000\text{ ms}
+\end{aligned}
+$$
+
+Convertimos el resultado a segundos:
+
+$$
+T=\frac{6000}{1000}=6\text{ s}
+$$
+
+Por lo tanto, el tiempo de espera máximo acumulado es de 6 segundos
+
+
+
+          \end{enumerate}

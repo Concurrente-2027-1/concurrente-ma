@@ -1,0 +1,68 @@
+\item[\textbf{5.}] \textbf{[30 min/20 puntos]} \textcolor{dkgreen}{Peterson es una implementación de un candado para dos hilos. En la implementación siguiente (\textit{DoublePeterson}) se utilizan tres candados Peterson para realizar una implementación de un candado para 4 hilos; se asume que a cada hilo le corresponde un ID único entre $1$ y $4$.}
+
+    \textcolor{dkgreen}{Recuerda que en el candado de Peterson se cumplen las propiedades de Exclusión mutua, Deadlock-free y Starvation-free. Argumenta si \textit{DoublePeterson} cumple con:}
+
+    \begin{enumerate}
+        \item \textcolor{dkgreen}{Exclusión mutua.}
+        \item \textcolor{dkgreen}{Deadlock-free.}
+        \item \textcolor{dkgreen}{Starvation-free.}
+        \item \textcolor{dkgreen}{Justicia.}
+    \end{enumerate}
+
+    \textcolor{red}{\textbf{Hint:} Si cumple con la propiedad, muestra la invariante que se mantiene (en el caso de la Exclusión mutua y Justicia), o muestra la cosa buena que pasará (en el caso de Deadlock-free y Starvation-free). No hace falta que demuestres Peterson.}
+
+    \textcolor{dkgreen}{Si no cumple con alguna propiedad, muestra una ejecución que lo justifique.}
+
+    \begin{lstlisting}[language=Java]
+class DoublePeterson implements Lock { // Candado para n = 4 hilos
+    Shared Variables:
+        1: Lock lock1, lock2, lock3;
+        2: DoublePeterson() {
+        3:     lock1 = petersonLock();
+        4:     lock2 = petersonLock();
+        5:     lock3 = petersonLock();
+        6: }
+
+        7: void lock() {
+        8:     int me = ThreadID.get(); // Cada hilo tiene un ID único de 1 a 4
+        9:     if (me == 1 or me == 2) {
+        10:        lock1.lock(); // Los hilos 1 y 2 toman el candado 1
+        11:    }
+        12:    if (me == 3 or me == 4) {
+        13:        lock2.lock(); // Los hilos 3 y 4 toman el candado 2
+        14:    }
+        15:    lock3.lock(); // Todos pueden tomar el candado 3
+        16: }
+
+        17: void unlock() {
+        18:     int me = ThreadID.get();
+        19:     lock3.unlock();
+        20:     if (me == 1 or me == 2) {
+        21:        lock1.unlock();
+        22:    }
+        23:    if (me == 3 or me == 4) {
+        24:        lock2.unlock();
+        25:    }
+        26: }
+}
+    \end{lstlisting}
+
+    \begin{center}
+        \textbf{Figura 2:} Implementación de un candado ``DoublePeterson''.
+    \end{center}
+\begin{enumerate}
+    \item Exclusión Mutua \\
+    La invariante sería, que para que cualquier hilo logre entrar a la sección crítica, debe haber ejecutado exitosamente \texttt{lock3.lock()}. Como \texttt{lock3} es un candado de Peterson, su invariante garantiza que a lo más, un solo hilo puede poseerlo a la vez. Al ser \texttt{lock3} el último paso del método \texttt{lock()} del \texttt{DoublePeterson}, es imposible que dos hilos esten en la CS simultaneamente. Por lo tanto, si cumple con Exclusión Mutua.
+    \item Deadlock-free \\
+    Si varios hilos intentan entrar, el sistema siempre avanzará. Sabemos que los candados de Peterson son deadlock-free. Si los hilos 1 y 2 compiten en \texttt{lock1}, al menos uno ganará. Si los hilos 3 y 4 compiten en \texttt{lock2}, al menos uno ganará. A lo más, habrá dos ganadores compitiendo por \texttt{lock3}. Como \texttt{lock3} también es deadlock-free, obligatoriamente se resolverá el empate y dejará pasar a uno. El sistema nunca se congela. Por lo tanto \texttt{DoublePeterson} es deadlock-free.
+    \item Starvation-free \\
+    Si un hilo particular (digamos el Hilo 1) quiere entrar a la CS, eventualmente lo logrará. Primero competirá por \texttt{lock1}, y como \texttt{Peterson} es starvation-free, el hilo 2 no puede permanecer ahí infinitamente, así que el hilo 1 eventualmente ganará \texttt{lock1}. Una vez con \texttt{lock1}, el hilo 1 competirá por \texttt{lock3}, en la que nuevamente este tiene la propiedad de starvation-free, por lo que su entrada eventual a la CS está garnatizada. Por lo tanto, \texttt{DoublePeterson} cumple starvation-free.
+    \item FIFO (Justicia) \\
+    Supongamos que se inició el doorway en todos lo hilos del sistema.
+    \begin{enumerate}
+        \item El hilo 1 quiere entrar. Ejecuta \texttt{lock1.lock()}. Realiza su doorway completo (levanta su bandera y se hace víctima en el candado 1). En ese momento, el sistema lo pausa, justo antes de evaluar su \texttt{while}, es decir \texttt{D_1} ya terminó.
+        \item El hilo 3 quiere entrar. Ejecuta \texttt{lock2.lock()}. El hilo 3 pasa su doorway, y no se detiene en el ciclo \texttt{while}, ganando \texttt{lock2}.
+        \item El hilo 3 avanza y ejecuta \texttt{lock3.lock()}. Como nadie más está compitiendo al final todavía, pasa el doorway y no se detiene en el \texttt{while} y entra a la sección crítica.
+    \end{enumerate}
+    Entonces, el hilo 1 terminó su doorway global antes de que el hilo 3 empezara a perdir el candado ($D_1 \rightarrow D_3$), pero el hilo 3 logró entrar a la CS primero ($CS_3 \rightarrow CS_1$). Por lo tanto no cumple FIFO.
+\end{enumerate}

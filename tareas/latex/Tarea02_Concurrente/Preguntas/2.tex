@@ -1,0 +1,83 @@
+\item[\textbf{2.}] \textbf{[30 min/25 puntos]} \textcolor{dkgreen}{Argumenta si la siguiente implementación (\textit{VictimAround}) de un candado para dos hilos cumple con:}
+
+    \begin{enumerate}
+        \item \textcolor{dkgreen}{Exclusión mutua.}
+
+        En este caso sí se cumple con la propiedad de exclusión mutua, en cuanto a la invariante tenemos que si un hilo $i$ está dentro de la sección crítica, entonces \texttt{victim} $= j$ (el nombre del otro hilo), e $i$ no vuelve a escribir en \texttt{victim} mientras siga adentro (solo lo hará hasta que llame a \texttt{unlock()} y vuelva a intentar entrar).\\
+
+        \textbf{Justificación:} Para que un hilo $i$ salga del ciclo externo y entre a la sección crítica, necesita leer \texttt{victim} $\neq$ \texttt{me}. Como solo hay dos hilos, eso significa que \texttt{victim} debe valer exactamente $j$. Esto solo puede pasar si la \emph{última} escritura sobre \texttt{victim} fue hecha por $j$.
+        
+        Una vez que $i$ ya está adentro, no vuelve a tocar \texttt{victim} hasta terminar y hacer \texttt{unlock()}. Si mientras tanto $j$ intenta entrar, se queda atorado en el ciclo interno porque \texttt{busy} ya vale \texttt{true}.\\
+        
+        Supongamos, por contradicción, que los dos hilos ($0$ y $1$) están adentro al mismo tiempo, mientras $0$ está adentro, \texttt{victim} $= 1$; y mientras $1$ está adentro, \texttt{victim} $= 0$. Pero \texttt{victim} es una sola variable: no puede valer $0$ y $1$ a la vez. Dado lo anterior tenemos una contradicción y por lo tanto no podemos tener ambos hilos dentro, esto cumple con exclusión mutua. 
+
+        \item \textcolor{dkgreen}{Deadlock-free.}
+
+        En este caso no se cumple, para esto podemos poner como ejemplo qué pasaría si sólo tenemos un hilo. Supongamos que tenemos el hilo $A$, este es el único hilo que llama a \texttt{lock()}.
+
+    \begin{enumerate}
+        \item[$t_1$:] $A$ ejecuta la línea 7: \texttt{victim = A}.
+        \item[$t_2$:] $A$ evalúa la línea 8: \texttt{busy == false} (nadie más ha tocado \texttt{busy}) $\Rightarrow$ sale del ciclo interno.
+        \item[$t_3$:] $A$ ejecuta la línea 9: \texttt{busy = true}.
+        \item[$t_4$:] $A$ evalúa la línea 10: \texttt{victim == A}? $\Rightarrow$ \textbf{verdadero} (nadie más escribió \texttt{victim}) $\Rightarrow$ el ciclo externo se repite.
+        \item[$t_5$:] $A$ vuelve a la línea 7: \texttt{victim = A} (otra vez, sigue siendo su propio nombre).
+        \item[$t_6$:] $A$ evalúa la línea 8: \texttt{busy == true} (él mismo lo puso en $t_3$, y nadie hará \texttt{unlock()} porque $A$ nunca llegó a la sección crítica) $\Rightarrow$ $A$ queda atrapado repitiendo \texttt{victim = A} para siempre.
+    \end{enumerate}
+
+    En pocas palabras $A$ nunca regresa de \texttt{lock()}, y ningún otro hilo completa pasos ya que sólo tenemos uno. Esto viola la definición de \textit{deadlock-free}, ya que el algoritmo necesita \emph{competencia} para poder avanzar. Como tenemos un solo hilo siempre es el último en escribir la nota, así que siempre se ve a sí mismo al revisarla, y por lo tanto nunca lo dejan pasar.
+        
+        \item \textcolor{dkgreen}{Starvation-free.}
+
+        Como Deadlock-free no se cumple, podemos saber que Starvation-free tampoco se va a cumplir, para esto ahora definamos dos hilos $A$ y $B$ los cuales compiten por adquirir el candado:
+
+        \begin{enumerate}
+    \item Ambos hilos observan que \texttt{busy == false}.
+    \item El hilo $A$ ejecuta \texttt{victim = A}.
+    \item El hilo $B$ ejecuta \texttt{victim = B}.
+    \item Ambos hilos establecen \texttt{busy = true}.
+    \item El hilo $A$ observa que \texttt{victim != A} y entra
+    en la sección crítica.
+    \item El hilo $B$ observa que \texttt{victim == B} y debe
+    volver a intentarlo.
+    \item El hilo $A$ libera el candado.
+    \item Se repiten los pasos anteriores, favoreciendo nuevamente
+    al hilo $A$.
+\end{enumerate}
+
+Esta ejecución puede repetirse indefinidamente, de modo que el
+hilo $B$ nunca consigue entrar en la sección crítica y por lo tanto no se cumple que cada hilo pueda avanzar eventualmente. 
+
+    \end{enumerate}
+
+    \textcolor{red}{\textbf{Hint:} Si no lo cumple, describe un ejemplo de una ejecución. Si lo cumple, encuentra una invariante y justifica el porqué.}
+
+    \begin{lstlisting}[language=Java]
+class VictimAround implements Lock {
+    Shared Variables:
+        1: int victim;
+        2: boolean busy = false;
+        3: void lock() {
+        4:     int me = ThreadID.get();
+        5:     do {
+        6:         do {
+        7:             victim = me;
+        8:         } while(busy == true);
+        9:         busy = true;
+        10:    } while(victim == me);
+        11: }
+        12: void unlock() {
+        13:     busy = false;
+        14: }
+}
+    \end{lstlisting}
+
+    \begin{center}
+        \textbf{Figura 1:} Implementación de un candado ``VictimAround''.
+    \end{center}
+
+
+
+
+
+
+

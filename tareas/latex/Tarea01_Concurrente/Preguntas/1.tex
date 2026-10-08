@@ -1,0 +1,37 @@
+\textcolor{blue}{1. [25 min/30 puntos] Considera que un problema de manera secuencial se resuelve en un tiempo
+de 2k nanosegundos, en donde k es el tamaño de la entrada (si el tamaño de la entrada es de
+k = 100, entonces el cómputo toma 200 nanosegundos). Supongamos que este problema es $100\%$
+paralelizable, si el número de hilos es de 8. ¿Cuál es el tamaño máximo de la entrada que se puede
+procesar en 0.5 segundos ($5 \cdot 10^8$ nanosegundos)?} \textcolor{red}{Hint: utiliza nansosegundos en la ecuación.}\\
+
+Lo primero que hacemos es convertir el tiempo en nanosegundos 
+$$0.5 s = 5 \cdot10^8 ns$$
+
+como el problema dice que es $100\%$ paralelizable usamos la Ley de Amdahl
+$$S(n)=\frac{1}{(1-p)+\frac{p}{n}}$$
+
+donde tenemos 
+$$p=1$$
+$$n=8$$
+
+sustituimos
+
+$$S(8)=\frac{1}{(1-1)+\frac{1}{8}} = 8$$
+
+Tomando en cuenta el resultado anterior tomamos la fórmula 
+
+$$S= \frac{T_s}{T_p}$$ 
+
+y despejamos $T_p$, por lo que la fórmula nos queda como 
+
+$$T_p = \frac{T_s}{S}$$
+
+como $S=8$ tenemos y el tiempo secuencial es de $T_s= 2k$, tenemos $T_p=\frac{2k}{8}$
+
+como el tiempo debe ser menos a $5\cdot10^8$ tenemos
+$$\frac{2k}{8} = \frac{k}{4}$$
+$$ \frac{k}{4} \leq 5\cdot10^8$$
+$$k \leq 20 \cdot10^8= 2 \cdot10^9$$
+$$= 2,000,000,000$$
+
+En conclusión el tamaño máximo de la entrada sería de $2\cdot10^9$ \\

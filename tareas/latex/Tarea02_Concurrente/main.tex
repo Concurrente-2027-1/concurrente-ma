@@ -1,0 +1,110 @@
+\documentclass[12pt,a4paper]{article}
+
+% --------------------------------------------------
+% Paquetes
+% --------------------------------------------------
+
+% Símbolos y matemáticas
+\usepackage{fdsymbol}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+% Algoritmos
+\usepackage{algpseudocode}
+
+% Tablas y columnas
+\usepackage{multirow}
+\usepackage{multicol}
+
+% Imágenes y comentarios
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{comment}
+
+% Código fuente
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Configuración de idioma
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+
+% Márgenes
+\usepackage[
+    top=3cm,
+    bottom=3cm,
+    left=2cm,
+    right=2cm,
+    heightrounded
+]{geometry}
+
+% Hipervínculos
+\usepackage{hyperref}
+
+% --------------------------------------------------
+% Configuración de código
+% --------------------------------------------------
+
+\definecolor{codegray}{gray}{0.95}
+\definecolor{dkgreen}{rgb}{0,0.45,0}
+
+\lstset{
+    backgroundcolor=\color{codegray},
+    basicstyle=\ttfamily\small,
+    frame=single,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    showstringspaces=false
+}
+
+% --------------------------------------------------
+% Encabezado y pie de página
+% --------------------------------------------------
+
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+\cfoot{\thepage}
+\lhead{Tarea 2}
+\rhead{\textsc{Cómputo Concurrente}}
+
+% --------------------------------------------------
+% Documento
+% --------------------------------------------------
+
+\begin{document}
+
+\input{Portada}
+
+% Fin de portada
+% -----------------------------------
+
+\newpage
+\newpage
+\definecolor{morado}{rgb}{0.57, 0.36, 0.51}
+\definecolor{azul}{rgb}{0.36, 0.54, 0.66}
+\definecolor{verde}{rgb}{0.55, 0.71, 0.0}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\section*{\textcolor{azul}{Ejercicios}}
+\begin{enumerate}
+\input{Preguntas/1}
+
+\input{Preguntas/2}
+
+\input{Preguntas/3}
+
+\input{Preguntas/4}
+
+\input{Preguntas/5}
+\end{enumerate}
+
+\end{document}
+

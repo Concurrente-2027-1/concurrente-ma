@@ -1,0 +1,9 @@
+\item[\textbf{2.}] \textbf{[20 min/15 puntos]} \textcolor{dkgreen}{¿La siguiente propiedad es equivalente a decir que un objeto $x$ es \textit{wait-free}? Argumenta por qué.}\\
+\textcolor{blue}{\textbf{Propiedad.} \textit{Para toda historia infinita $H$ de $x$, cada hilo que toma un número infinito de pasos en H, completa un número infinito de llamadas a métodos.}}
+Recordemos que la definición normal de \textit{Wait-Free} nos garantiza que cada llamada a un método termina en un número finito de pasos en ese hilo, independientemente de lo que pase con los demás. Notemos que si un objeto es \textit{Wait-free}, al tomar un hilo infinitos pasos, estará completando un método (en una cantidad finita de pasos), luego otro método y luego otro, así sucesivamente. Como cada uno toma un tiempo finito, un número infinito de pasos obligatoriamente resulta en un número infinito de llamadas a métodos completadas. Sin embargo, si el objeto no fuera \textit{Wait-free} (supongamos solo \texttt{Lock-free}), un hilo podría dar infinitos pasos ejecutando eternamente un ciclo. En ese caso, daría un número infinito de pasos, pero completaría cero llamadas a métodos, y no cumpliría la propiedad del enunciado.\\
+Por lo tanto, la propiedad describe la misma condición de \textit{Wait-free} qué es que se garantiza que todos los hilos terminan incluso tratandose de un tiempo de ejecución infinita.
+
+
+
+
+

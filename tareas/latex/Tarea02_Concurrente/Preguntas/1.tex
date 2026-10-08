@@ -1,0 +1,54 @@
+\item[\textbf{1.}] \textbf{[15 min/15 puntos]} \textcolor{dkgreen}{Muestra un ejemplo de una ejecución de la implementación de \textit{Filter} en la que a un hilo A lo rebasa más de una vez cualquier hilo B. Considera un número $n$ de hilos mayor a 10. Explica por qué no se cumple la propiedad de Justicia.}
+
+    \textcolor{red}{\textbf{Hint:} Puedes mostrar una imagen de una ejecución o describirla.}
+
+En este caso tomaremos $n = 11$ hilos ($T_0, T_1, T_2, \dots, T_{10}$). De estos hilos consideraremos al hilo A ($T_0$) y al hilo B ($T_1$) como base, donde el hilo B será el que rebase más de una vez al hilo A.
+
+Recordando el algoritmo Filter, utilizamos dos arreglos globales:
+\begin{itemize}
+    \item \texttt{level[i]}: indica el nivel actual del hilo $i$ (donde $0$ significa fuera de la sección crítica).
+    \item \texttt{victim[L]}: indica qué hilo fue el último en llegar al nivel $L$ y, por lo tanto, cede el paso en caso de conflicto.
+\end{itemize}
+
+Cada hilo $T_i$ ejecuta el siguiente algoritmo para entrar a la Sección Crítica (SC):
+
+\begin{verbatim}
+for (L = 1; L < n; L++) {
+    level[i] = L;
+    victim[L] = i;
+    while ((exists k != i such that level[k] >= L) && victim[L] == i) {
+        // espera activa
+    }
+}
+\end{verbatim}
+
+Y al salir de la Sección Crítica ejecuta:
+$$level[i] = 0$$
+
+\subsubsection*{Estado inicial}
+\begin{itemize}
+    \item El hilo A ($T_0$) inicia su protocolo de entrada al Nivel 1. Ejecuta \textbf{level[A] = 1} y \textbf{victim[1] = A}.
+    \item El hilo A queda atorado en el Nivel 1 esperando en el \texttt{while} debido a que \textbf{victim[1] == A} y hay otros hilos activos.
+\end{itemize}
+
+\subsubsection*{Primer rebase de B}
+\begin{itemize}
+    \item El hilo B ($T_1$) inicia su ejecución e intenta entrar al Nivel 1. Ejecuta \textbf{level[B] = 1} y escribe \textbf{victim[1] = B}.
+    \item Al convertirse \textbf{B} en la nueva víctima del Nivel 1 (\texttt{victim[1] == B}), el hilo A se libera de su condición de espera.
+    \item A avanza inmediatamente al Nivel 2, ejecuta \textbf{level[A] = 2} y \textbf{victim[2] = A}. Ahora A queda atorado en el Nivel 2.
+    \item Mientras tanto, los hilos $T_2, T_3, \dots, T_{10}$ avanzan rápidamente tomando el rol de víctima sucesivamente en niveles superiores.
+    \item El hilo B ($T_1$) aprovecha este movimiento, sube rápidamente por todos los niveles ($L_1$ a $L_{10}$) desplazando a otros hilos, entra a la Sección Crítica (SC) y sale (\textbf{level[B] = 0}).
+\end{itemize}
+
+\subsubsection*{Segundo rebase de B}
+\begin{itemize}
+    \item El hilo A permanece congelado en el Nivel 2 (\texttt{victim[2] == A}).
+    \item El hilo B vuelve a iniciar su protocolo de entrada desde cero. B entra al Nivel 1 y luego al Nivel 2 escribiendo \textbf{victim[2] = B}.
+    \item Al ser B la nueva víctima del Nivel 2, desbloquea a A. El hilo A avanza al Nivel 3 y queda atorado como \textbf{victim[3] = A}.
+    \item B se mueve ágilmente por los niveles superiores, supera nuevamente a A, entra por segunda vez a la Sección Crítica y sale.
+\end{itemize}
+
+Este patrón se puede repetir indefinidamente: B puede entrar $N$ veces a la Sección Crítica mientras A es arrastrado lentamente nivel por nivel.
+
+\subsection*{¿Por qué no se cumple la propiedad de Justicia?}
+El algoritmo Filter no utiliza estampas de tiempo (\textit{timestamps}) ni colas FIFO para registrar el orden de llegada de las peticiones; únicamente mantiene el estado instantáneo actual (\texttt{level} y \texttt{victim}). Dado que no existe una garantía de First-Come, First-Served (FCFS), un hilo más rápido puede rebasar un número ilimitado de veces a un hilo más lento.\\

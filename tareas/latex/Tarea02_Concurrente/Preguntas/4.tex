@@ -1,0 +1,96 @@
+\item[\textbf{4.}] \textbf{[15 min/15 puntos]} \textcolor{dkgreen}{Justicia y el Algoritmo de Peterson.}
+
+    \textcolor{dkgreen}{Considera la implementación del algoritmo de Peterson para 2 hilos:}
+
+    \begin{lstlisting}[language=Java]
+class Peterson implements Lock {
+    private boolean[] flag = new boolean[2];
+    private volatile int victim;
+
+    public void lock() {
+        int i = ThreadID.get();
+        int j = 1 - i;
+        flag[i] = true;       // 1. Me interesa
+        victim = i;           // 2. Cedo el paso (cortesía)
+
+        // Espero si:
+        // El otro quiere pasar Y yo soy la víctima
+        while (flag[j] && victim == i) {}
+    }
+
+    public void unlock() {
+        flag[ThreadID.get()] = false;
+    }
+}
+    \end{lstlisting}
+
+    \textcolor{dkgreen}{Recuerda la definición formal de Justicia (\textit{First-Come-First-Served}/FIFO) vista en clase.}
+
+    \textcolor{dkgreen}{Dividimos el método \texttt{lock()} en dos secciones:}
+
+    \begin{itemize}
+        \item \textcolor{azul}{\textbf{Doorway (Entrada):} Intervalo finito de pasos (código sin bucles infinitos).}
+        \item \textcolor{azul}{\textbf{Waiting (Espera):} El bucle \texttt{while} donde se puede esperar indefinidamente.}
+    \end{itemize}
+
+    \textcolor{dkgreen}{La propiedad FIFO establece que si el Hilo A termina su \textit{Doorway} antes de que el Hilo B empiece el suyo ($D_A \rightarrow D_B$), entonces A debe entrar a la Sección Crítica antes que B ($CS_A \rightarrow CS_B$).}
+
+    \textcolor{azul}{\textbf{Responde lo siguiente:}}
+
+    \begin{enumerate}
+        \item \textcolor{dkgreen}{Identifica y escribe exactamente qué líneas de código corresponden a la sección \textit{Doorway} y cuáles a la sección \textit{Waiting} en el algoritmo de Peterson.}\\
+        Basándonos en la definición (Doorway que son los pasos finitos antes de esperar, y Waiting es el ciclo donde te puedes quedar atascado), las secciones en el código de Peterson son: \\
+        - Doorway (Entrada): Aunque las declaraciones de variables locales \texttt{int i} e \texttt{int j}, se podría considerar que también son parte del doorway (ya que son pasos finitos antes del waiting),  las escrituras en memoria compartida \texttt{flag} y \texttt{victim} son las que importan.
+        \begin{lstlisting}[language=Java]
+        flag[i] = true; // 1. Me interesa
+        victim = i;     // 2. Cedo el paso\end{lstlisting}
+        - Waiting (Espera): Es claro que ciclo \texttt{while} es el indicador principal para esta sección. Es posible que pueda esperar indefinidamente.
+        \begin{lstlisting}[language=Java]
+        // Espero si: El otro quiere pasar y yo soy la víctima
+        while(flag[j] && victim == i){}\end{lstlisting}
+        \item \textcolor{dkgreen}{Demuestra analíticamente si el algoritmo de Peterson cumple o no cumple con esta propiedad de Justicia (FIFO). Para ello, analiza el escenario donde el Hilo A termina su \textit{Doorway} y se pausa, y justo después el Hilo B empieza y ejecuta su \textit{Doorway} completo. ¿Quién logra pasar la sección de \textit{Waiting} primero y por qué?}\\
+        Dados los hilos $A$ y $B$, si el doorway de $A$ ($D_1$) termina antes que que el de $B$ ($D_B$), recordemos que se cumple la propiedad FIFO si $A$ entra a la sección crítica ($CS_A$) antes que lo haga $B$ ($CS_B$):
+        \begin{equation}
+            D_A \rightarrow D_B \quad \Longrightarrow \quad CS_A \rightarrow CS_B
+        \end{equation}
+        De acuerdo al escenario planteado, analicemos el valor de las variables en cada paso:
+        \begin{enumerate}
+            \item El Hilo A ejecuta su Doorway y luego se pausa:
+            \begin{itemize}
+                \item A ejecuta \texttt{flag[A] = true}.
+                \item A \texttt{ejecuta victim = A}.
+                \item La memoria queda al momento como:
+                \begin{center}
+                    \begin{tabular}{| c | c |}
+                    \hline
+                    Variable & Valor \\ \hline
+                    \texttt{flag[A]} & \texttt{true} \\
+                    \texttt{flag[B]} & \texttt{false} \\
+                    \texttt{victim} & \texttt{A} \\ \hline
+                    \end{tabular}
+                \end{center}
+                \item El Hilo $A$ se pausa.
+            \end{itemize}
+            \item El Hilo B inicia y ejecuta su Doorway:
+            \begin{itemize}
+                \item B ejecuta \texttt{flag[B] = true.}
+                \item B ejecuta \texttt{victim = B}.
+                \item La memoria queda al momento como:
+                \begin{center}
+                    \begin{tabular}{| c | c |}
+                    \hline
+                    Variable & Valor \\ \hline
+                    \texttt{flag[A]} & \texttt{true} \\
+                    \texttt{flag[B]} & \texttt{true} \\
+                    \texttt{victim} & \texttt{B} \\ \hline
+                    \end{tabular}
+                \end{center}
+            \end{itemize}
+            \item En este punto tenemos dos opciones en Waiting:
+            \begin{itemize}
+                \item \textbf{El hilo A queda pausado}: El hilo B seguira evaluando su bucle \texttt{while(flag[B] && victim == A)}, donde ambas condiciones son verdaderas (debido a que B fue el último en escribirse a si mismo como \texttt{victim}). Por lo tanto B entra al ciclo y se queda esperando indefinidamente, sin entrar a la sección crítica.
+                \item \textbf{El hilo A se reanuda}: A evalua su bucle \texttt{while(flag[B] && victim == A)}, donde la última condición es falsa (debido a que B fue el último en escribirse a si mismo como \texttt{victim}). Por lo tanto, A no entra al ciclo y entra la sección crítica ($CS_A$). Eventualmente, si A termina sin errores su $CS_A$, entonces B rompería su ciclo y ejecutaría la sección crítica ($CS_B$).
+            \end{itemize}
+        \end{enumerate}
+        Al revisar ambos casos, se cumple que si el hilo A, al haber llegado y terminado primero su doorway, logra pasar a la sección de Waiting antes que el hilo B, es decir $CS_A \rightarrow CS_B$. Por lo tanto, el algoritmo de Peterson para 2 hilos cumple con la propiedad de Justicia (FIFO).
+    \end{enumerate}
