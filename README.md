@@ -17,6 +17,7 @@ Entre los recursos que se encuentran actualmente en este repositorio están:
 - **Tarea 01**. Introducción al cómputo concurrente.
 - **Tarea 02**. Problemas Clásicos.
 - **Tarea 03**. Objetos Concurrentes y `volatile`.
+- **Tarea 04**. Registros y Snapshots.
 
 ### Prácticas:
 - **Práctica 01**. Repaso de Java e introducción a la programación multihilos.
@@ -42,12 +43,14 @@ Entre los recursos que se encuentran actualmente en este repositorio están:
 │   └── src/
 ├── practica4/
 |   ├── docs/
+|   |   └── Practica04_Concurrente.pdf
 │   └── src/
 ├── tareas/
 |   ├── docs/
 |   |   ├── Tarea01_Concurrente.pdf
 |   |   ├── Tarea02_Concurrente.pdf
-|   |   └── Tarea03_Concurrente.pdf
+|   |   ├── Tarea03_Concurrente.pdf
+|   |   └── Tarea04_Concurrente.pdf
 │   └── latex/
 ├── README.md
 └── .gitignore
